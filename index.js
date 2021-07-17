@@ -10,12 +10,14 @@ const PORT = 8888
 const app = exp()
 let downloaded_page = ''
 let rendered_page = ''
+let page_object = {}
 
 // start headless browser
 async function download_page(){
     log('Fetching')
     const browser = await puppet.launch()
     const page = await browser.newPage()
+    page_object = page
     await page.goto(spoofURL, {
         waitUntil: "networkidle2"
     })
@@ -25,6 +27,7 @@ function render_page(){
     log('Rendering page')
 //  parse to dom and alter paths
     let dom = cheer.load(downloaded_page)
+    log(dom)
     // replace image paths
     dom('img').each((i, el)=>{
         let src = el.attribs.src
@@ -42,7 +45,7 @@ function render_page(){
     //     }
     // })
     // log(dom.toString())
-    rendered_page = dom.toString()
+    rendered_page = dom.html()
     createLog(rendered_page)
 }
 // easy to view log of rendered input/output
@@ -82,5 +85,5 @@ app.listen(PORT, (err) => {
 // Routing
 
 app.get('/', (req, res) => {
-    res.send(rendered)
+    res.send(rendered_page)
 })
