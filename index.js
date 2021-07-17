@@ -31,13 +31,15 @@ if(args[2] && isURL(args[2])){
 // start headless browser
 async function download_page(url){
     log('Fetching')
-    const browser = await puppet.launch()
-    const page = await browser.newPage()
+    const browser = await puppet.launch() // launch browser
+    const page = await browser.newPage() // open page
     page_object = page
     await page.goto(spoofURL, {
         waitUntil: "networkidle2"
     })
-    downloaded_page = await page.content()
+    downloaded_page = await page.content() // download content
+    await page.close() // closes tab
+    await browser.close() // close browser
 }
 function render_page(url){
     log('Rendering page')
