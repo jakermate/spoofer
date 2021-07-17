@@ -3,6 +3,7 @@ const axios = require('axios').default
 const cheer = require('cheerio').default
 const puppet = require('puppeteer')
 const fs = require('fs/promises')
+const isURL = require('is-url')
 const path = require('path')
 let spoofURL = "https://www.google.com"
 const log = console.log
@@ -14,10 +15,11 @@ let page_object = {}
 
 // check for args
 let args = process.argv
-if(args[2]){
-    log(`Argument present - ${args[2]}`)
+if(args[2] && isURL(args[2])){
+    log(`URL argument present - ${args[2]}`)
     // set optional arg to spoofURL
     spoofURL = args[2]
+
 } 
 
 // start headless browser
@@ -35,7 +37,6 @@ function render_page(){
     log('Rendering page')
 //  parse to dom and alter paths
     let dom = cheer.load(downloaded_page)
-    log(dom)
     // replace image paths
     dom('img').each((i, el)=>{
         let src = el.attribs.src
@@ -43,7 +44,6 @@ function render_page(){
         log(i + "  " + newSrc)
         el.attribs['src'] = newSrc
     })
- 
     // set rendered page to active html string for main / route
     rendered_page = dom.html()
     createLog(rendered_page)

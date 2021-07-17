@@ -10,12 +10,12 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "global": "^4.4.0",
+    "is-url": "^1.2.4",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
     "puppeteer": "^10.1.0"
   },
   "scripts": {
-    // start 
     "google": "nodemon index.js https://www.google.com",
     "reddit": "nodemon index.js https://www.reddit.com",
     "gmail": "nodemon index.js https://gmail.com"
