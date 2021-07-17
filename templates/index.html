@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-gray-100">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <title>Spoofer</title>
   </head>
   <body>
-      <header>
-          <h1>Spoofer</h1>
+      <header class="container mx-auto text-center mt-32">
+          <h1 class="font-semibold text-4xl text-center">SPOOFER</h1>
+          <h5 class="font-light text-lg text-center">Pentesting Site Spoof Tool</h5>
+          <form action="/spoof" method="POST" class="mt-12 max-w-xl mx-auto w-full">
+            <input type="text" name="url" id="url" class="p-2 bg-gray-200 w-full" placeholder="URL (i.e. https://www.google.com)"/>
+            <br>
+            <input type="submit" value="Create Spoof Site" class="mt-6 py-3 px-5 font-bold shadow-sm">
+        </form>
+        <div class="mt-32 font-light text-sm">*This site is to be used soely for the purposes of pentesting or ethical hacking, and is not authorized for use in illegal activity.</div>
       </header>
-    <form action="/spoof" method="POST"><input type="text" name="url" id="url" />
-        <input type="submit" value="Spoof Site">
-    </form>
+   
   </body>
 </html>

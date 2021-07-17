@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\root\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add is-url
+  C:\Program Files\nodejs\node.exe C:\Users\root\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add tailwincss
 
 PATH: 
   C:\Users\root\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\root\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files\nodejs;C:\Program Files\Git\cmd;C:\Users\root\AppData\Local\Microsoft\WindowsApps;C:\Users\root\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\root\AppData\Roaming\npm;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl
@@ -14,16 +14,21 @@ Platform:
   win32 x64
 
 Trace: 
-  SyntaxError: C:\Users\root\Desktop\projects\spoofer\package.json: Unexpected token / in JSON at position 365
-      at JSON.parse (<anonymous>)
-      at C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:1625:59
-      at Generator.next (<anonymous>)
-      at step (C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:310:30)
-      at C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:321:13
+  Error: https://registry.yarnpkg.com/tailwincss: Not found
+      at Request.params.callback [as _callback] (C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66988:18)
+      at Request.self.callback (C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140662:22)
+      at Request.emit (node:events:394:28)
+      at Request.<anonymous> (C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141634:10)
+      at Request.emit (node:events:394:28)
+      at IncomingMessage.<anonymous> (C:\Users\root\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141556:12)
+      at Object.onceWrapper (node:events:513:28)
+      at IncomingMessage.emit (node:events:406:35)
+      at endReadableNT (node:internal/streams/readable:1331:12)
+      at processTicksAndRejections (node:internal/process/task_queues:83:21)
 
 npm manifest: 
   {
-    "name": "node",
+    "name": "spoofer",
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
@@ -34,12 +39,12 @@ npm manifest:
       "cors": "^2.8.5",
       "express": "^4.17.1",
       "global": "^4.4.0",
+      "is-url": "^1.2.4",
       "morgan": "^1.10.0",
       "node-fetch": "^2.6.1",
       "puppeteer": "^10.1.0"
     },
     "scripts": {
-      // start 
       "google": "nodemon index.js https://www.google.com",
       "reddit": "nodemon index.js https://www.reddit.com",
       "gmail": "nodemon index.js https://gmail.com"
@@ -555,6 +560,11 @@ Lockfile:
     version "1.9.1"
     resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
     integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
+  
+  is-url@^1.2.4:
+    version "1.2.4"
+    resolved "https://registry.yarnpkg.com/is-url/-/is-url-1.2.4.tgz#04a4df46d28c4cff3d73d01ff06abeb318a1aa52"
+    integrity sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==
   
   locate-path@^5.0.0:
     version "5.0.0"

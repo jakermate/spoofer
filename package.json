@@ -13,7 +13,8 @@
     "is-url": "^1.2.4",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
-    "puppeteer": "^10.1.0"
+    "puppeteer": "^10.1.0",
+    "tailwindcss": "^2.2.4"
   },
   "scripts": {
     "google": "nodemon index.js https://www.google.com",
