@@ -1,4 +1,4 @@
-export default class Page{
+class Page{
     // vals
     downloaded_page
     rendered_page
@@ -16,3 +16,4 @@ export default class Page{
         return this.rendered_page
     }
 }
+module.exports = Page

