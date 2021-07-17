@@ -4,13 +4,21 @@ const cheer = require('cheerio').default
 const puppet = require('puppeteer')
 const fs = require('fs/promises')
 const path = require('path')
-const spoofURL = "https://www.google.com"
+let spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
 const app = exp()
 let downloaded_page = ''
 let rendered_page = ''
 let page_object = {}
+
+// check for args
+let args = process.argv
+if(args[2]){
+    log(`Argument present - ${args[2]}`)
+    // set optional arg to spoofURL
+    spoofURL = args[2]
+} 
 
 // start headless browser
 async function download_page(){
@@ -35,18 +43,11 @@ function render_page(){
         log(i + "  " + newSrc)
         el.attribs['src'] = newSrc
     })
-    // replace script sources
-    // dom('script').each((i, el)=>{
-    //     if(el.attribs['src']){
-            
-    //         let oldSRC = el.attribs['src']
-    //         let newSRC = spoofURL + oldSRC
-    //         el.attribs['src'] = newSRC
-    //     }
-    // })
-    // log(dom.toString())
+ 
+    // set rendered page to active html string for main / route
     rendered_page = dom.html()
     createLog(rendered_page)
+    log(`${spoofURL} spoof rendered.`)
 }
 // easy to view log of rendered input/output
 async function createLog(string){
