@@ -2,49 +2,58 @@ const exp = require('express')
 const axios = require('axios').default
 const cheer = require('cheerio').default
 const puppet = require('puppeteer')
+const fs = require('fs/promises')
+const path = require('path')
 const spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
 const app = exp()
+let downloaded_page = ''
 let rendered_page = ''
-let altered_page = ''
 
 // start headless browser
-async function grab_page(){
+async function download_page(){
     log('Fetching')
     const browser = await puppet.launch()
     const page = await browser.newPage()
     await page.goto(spoofURL, {
         waitUntil: "networkidle2"
     })
-    rendered_page = await page.content()
-    log(rendered_page)
+    downloaded_page = await page.content()
 }
-function alter_page(){
-    log('Altering page')
+function render_page(){
+    log('Rendering page')
 //  parse to dom and alter paths
-    let dom = cheer.load(rendered_page)
+    let dom = cheer.load(downloaded_page)
     // replace image paths
     dom('img').each((i, el)=>{
         let src = el.attribs.src
         let newSrc = spoofURL + src
+        log(i + "  " + newSrc)
         el.attribs['src'] = newSrc
     })
     // replace script sources
-    dom('script').each((i, el)=>{
-        if(el.attribs['src']){
+    // dom('script').each((i, el)=>{
+    //     if(el.attribs['src']){
             
-            let oldSRC = el.attribs['src']
-            let newSRC = spoofURL + oldSRC
-            el.attribs['src'] = newSRC
-        }
-    })
-    altered_page = dom.toString()
+    //         let oldSRC = el.attribs['src']
+    //         let newSRC = spoofURL + oldSRC
+    //         el.attribs['src'] = newSRC
+    //     }
+    // })
+    // log(dom.toString())
+    rendered_page = dom.toString()
+    createLog(rendered_page)
 }
+// easy to view log of rendered input/output
+async function createLog(string){
+    let filename = "log.txt"
+    await fs.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
 
+}
 async function initiate(){
-    await grab_page()
-    alter_page()
+    await download_page()
+    render_page()
 
 }
 
@@ -56,45 +65,22 @@ initiate()
 
 
 
+
+
+
+
+
+
+
+
 // startup
 app.listen(PORT, (err) => {
     if (err) log(err)
     log(`Server running on port ${PORT}`)
 })
 
-// grab page
-// axios.get(spoofURL).then(data => cached = data.data).then(data => {
-//     // parse to dom and alter paths
-//     let dom = cheer.load(cached)
-//     // replace image paths
-//     dom('img').each((i, el)=>{
-//         let src = el.attribs.src
-//         let newSrc = spoofURL + src
-//         el.attribs['src'] = newSrc
-//         log (el.attribs['src'])
-//     })
-//     // replace script sources
-//     dom('script').each((i, el)=>{
-//         log(el.attribs)
-//         if(el.attribs['src']){
-            
-//             let oldSRC = el.attribs['src']
-//             let newSRC = spoofURL + oldSRC
-//             el.attribs['src'] = newSRC
-//         }
-//     })
-//     cached = dom.html()
-    
-
-
-// }).catch(err => log(err))
-
-
-
-
-
 // Routing
 
 app.get('/', (req, res) => {
-    res.send(rendered_page)
+    res.send(rendered)
 })
