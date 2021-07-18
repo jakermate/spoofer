@@ -2,7 +2,7 @@
 const url = "/k"  // placeholder to be replaced
 // add listener
 window.addEventListener('keypress', async (ev)=>{
-    await _sendKey(ev.key)
+    await sendKey(ev.key)
 })
 async function sendKey(key){
     const data = {

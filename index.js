@@ -1,12 +1,12 @@
 const exp = require('express')
-const axios = require('axios').default
 const cheer = require('cheerio').default
 const puppet = require('puppeteer')
 const fsp = require('fs/promises')
 const fs = require('fs')
 const isURL = require('is-url')
 const path = require('path')
-const bodyparser = require('body-parser')
+const {v4: uuid, v4} = require('uuid')
+const Cache = require('./models/Cache')
 const Page = require('./models/Page')
 let spoofURL = "https://www.google.com"
 const log = console.log
@@ -18,9 +18,7 @@ const app = exp()
 let downloaded_page = ''
 let rendered_page = ''
 // production pages
-const page_cache = {
-
-}
+const page_cache = new Cache() // build new cache object
 
 // LOGGER
 const logger_script = fs.readFileSync(path.join(__dirname,'scripts', 'l.min.js'), 'utf-8')
@@ -63,21 +61,19 @@ function render_page(url){
     // set rendered page to active html string for main / route
     rendered_page = dom.html()
     createLog(rendered_page)
-    log(rendered_page)
     log(`${spoofURL} spoof rendered.`)
 }
 
-async function initiate(){
+async function PROGRAM_START(){
     await download_page()
     render_page()
-
 }
 
 
 
 
 // Entry
-initiate()
+PROGRAM_START()
 
 
 
@@ -90,8 +86,8 @@ app.listen(PORT, (err) => {
 })
 
 // MIDDLEWARE
-app.use(bodyparser.urlencoded({extended: false}))
-app.use(bodyparser.json())
+app.use(exp.urlencoded({extended: false}))
+app.use(exp.json())
 app.use('/scripts', exp.static('scripts'))
 app.use(exp.static('templates'))
 
