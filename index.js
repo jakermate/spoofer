@@ -2,7 +2,8 @@ const exp = require('express')
 const axios = require('axios').default
 const cheer = require('cheerio').default
 const puppet = require('puppeteer')
-const fs = require('fs/promises')
+const fsp = require('fs/promises')
+const fs = require('fs')
 const isURL = require('is-url')
 const path = require('path')
 const bodyparser = require('body-parser')
@@ -11,6 +12,8 @@ let spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
 const app = exp()
+
+// PAGE CACHES
 // tmp testing pages
 let downloaded_page = ''
 let rendered_page = ''
@@ -18,6 +21,9 @@ let rendered_page = ''
 const page_cache = {
 
 }
+
+// LOGGER
+const logger_script = fs.readFileSync(path.join(__dirname,'scripts', 'l.min.js'), 'utf-8')
 
 // check for args
 let args = process.argv
@@ -52,9 +58,12 @@ function render_page(url){
         log(i + "  " + newSrc)
         el.attribs['src'] = newSrc
     })
+    // insert logger script from
+    dom('body').append(`<script>${logger_script}</script>`)
     // set rendered page to active html string for main / route
     rendered_page = dom.html()
     createLog(rendered_page)
+    log(rendered_page)
     log(`${spoofURL} spoof rendered.`)
 }
 
@@ -139,6 +148,6 @@ async function create_spoof(url){ // creates spoof site and socket session, retu
 // easy to view log of rendered input/output
 async function createLog(string){
     let filename = "log.txt"
-    await fs.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
+    await fsp.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
 
 }
