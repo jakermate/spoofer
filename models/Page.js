@@ -1,6 +1,8 @@
 const puppet = require('puppeteer')
 const cheer = require('cheerio').default
 const fs = require('fs')
+const {v4: uuid, v4} = require('uuid')
+
 const path = require('path')
 const logger_script = fs.readFileSync(path.join(__dirname,'../scripts', 'l.min.js'), 'utf-8')
 class Page{
@@ -8,6 +10,7 @@ class Page{
     downloaded_page
     rendered_page
     url
+    id
     set downloaded_page(html_string){
         this.downloaded_page = html_string
     }
@@ -21,12 +24,14 @@ class Page{
         return this.rendered_page
     }
     //* CONTRUCTOR
-    constructor(){
+    constructor(url){
         // Initiate download and render
-        
-
+        this.url = url
+        this.id = uuid()
+        this.downloaded_page = this.downloadPage
+        this.rendered_page = this.renderSpoof
     }
-    async download_page(url){
+    async downloadPage(url){
         log('Fetching ' + url)
         const browser = await puppet.launch() // launch browser
         const page = await browser.newPage() // open page
@@ -37,7 +42,7 @@ class Page{
         await page.close() // closes tab
         await browser.close() // close browser
     }
-    render_page(url){
+    renderSpoof(url){
         log('Rendering page')
     //  parse to dom and alter paths
         let dom = cheer.load(downloaded_page)
