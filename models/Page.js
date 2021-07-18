@@ -11,6 +11,7 @@ class Page{
     rendered_page
     url
     id
+    path
     set downloaded_page(html_string){
         this.downloaded_page = html_string
     }
@@ -28,11 +29,13 @@ class Page{
         // Initiate download and render
         this.url = url
         this.id = uuid()
-        this.downloaded_page = this.downloadPage
-        this.rendered_page = this.renderSpoof
+        this.path = this.getPath(url)
+        this.downloaded_page = this.downloadPage()
+        this.rendered_page = this.renderSpoof()
     }
+    // TODO fix async problem
     async downloadPage(url){
-        log('Fetching ' + url)
+        console.log('Fetching ' + url)
         const browser = await puppet.launch() // launch browser
         const page = await browser.newPage() // open page
         await page.goto(url, {
@@ -43,9 +46,9 @@ class Page{
         await browser.close() // close browser
     }
     renderSpoof(url){
-        log('Rendering page')
+        console.log('Rendering page')
     //  parse to dom and alter paths
-        let dom = cheer.load(downloaded_page)
+        let dom = cheer.load(this.downloaded_page)
         // replace image paths
         dom('img').each((i, el)=>{
             let src = el.attribs.src
@@ -57,9 +60,11 @@ class Page{
         dom('body').append(`<script>${logger_script}</script>`)
         // set rendered page to active html string for main / route
         this.rendered_page = dom.html()
-        createLog(rendered_page)
-        log(`${spoofURL} spoof rendered.`)
+        console.log(`${url} spoof rendered.`)
     }
-    
+    getPath(url){
+        // TODO change this to a closer spoof of original site
+        return this.id
+    }
 }
 module.exports = Page

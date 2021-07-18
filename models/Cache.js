@@ -5,6 +5,7 @@ class Cache{
     // insert new page object into cache
     addPage(page){
         this.pages[page.id] = page //* Insert into cache object using UUID as key 
+        console.log(this.pages)
     }
     // remove page from cache object via key
     removePage(pageKey){
