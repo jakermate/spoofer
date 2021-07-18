@@ -1,3 +1,5 @@
+<img src="static/assets/ghost.png" width=120>
+
 # Spoofer
 
 ### Web Pen and Ethical Hacking Tool
