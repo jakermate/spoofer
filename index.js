@@ -14,15 +14,9 @@ const log = console.log
 const PORT = 8888
 const app = exp()
 
-//* PAGE CACHES
-//TODO: remove tmp testing pages below
-let downloaded_page = ''
-let rendered_page = ''
+//* PAGE CACHE
 // production pages
 const page_cache = new Cache() // build new cache object
-
-//* LOGGER
-const logger_script = fs.readFileSync(path.join(__dirname,'scripts', 'l.min.js'), 'utf-8')
 
 // check for args
 let args = process.argv
@@ -30,49 +24,7 @@ if(args[2] && isURL(args[2])){
     log(`URL argument present - ${args[2]}`)
     // set optional arg to spoofURL
     spoofURL = args[2]
-
 } 
-
-// TODO: Move these into Page class so that each instantiated page handles its own lifecycle
-async function download_page(url){
-    log('Fetching')
-    const browser = await puppet.launch() // launch browser
-    const page = await browser.newPage() // open page
-    await page.goto(spoofURL, {
-        waitUntil: "networkidle2"
-    })
-    downloaded_page = await page.content() // download content
-    await page.close() // closes tab
-    await browser.close() // close browser
-}
-function render_page(url){
-    log('Rendering page')
-//  parse to dom and alter paths
-    let dom = cheer.load(downloaded_page)
-    // replace image paths
-    dom('img').each((i, el)=>{
-        let src = el.attribs.src
-        let newSrc = spoofURL + src
-        log(i + "  " + newSrc)
-        el.attribs['src'] = newSrc
-    })
-    // insert logger script from
-    dom('body').append(`<script>${logger_script}</script>`)
-    // set rendered page to active html string for main / route
-    rendered_page = dom.html()
-    createLog(rendered_page)
-    log(`${spoofURL} spoof rendered.`)
-}
-
-
-
-// * PROGRAM ENTRY
-async function PROGRAM_START(){
-    await download_page()
-    render_page()
-}
-PROGRAM_START()
-
 
 
 
@@ -146,8 +98,8 @@ app.post('/k', async (req, res)=>{
 
 //* DEBUGGING
 // easy to view log of rendered input/output
-async function createLog(string){
-    let filename = "log.txt"
-    await fsp.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
+// async function createLog(string){
+//     let filename = "log.txt"
+//     await fsp.writeFile(path.join(__dirname, "logs", filename), `rendered page - \n ${string}\ndownloaded page - \n ${downloaded_page}`)
 
-}
+// }
