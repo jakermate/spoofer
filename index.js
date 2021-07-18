@@ -85,15 +85,12 @@ app.listen(PORT, (err) => {
 // MIDDLEWARE
 app.use(exp.urlencoded({extended: false}))
 app.use(exp.json())
+app.use(exp.static('static'))
 app.use('/scripts', exp.static('scripts'))
-app.use(exp.static('templates'))
 
 
 //* ROUTING
-// home test
-app.get('/home', (req, res)=>{
-    res.sendFile(path.join(__dirname, "templates", "index.html"))
-})
+
 // spoof page
 app.get('/:spoof_url', (req, res)=>{
     // 404 on non existant spoof or invalid url
@@ -103,9 +100,7 @@ app.get('/:spoof_url', (req, res)=>{
 })
 
 //? Main Page
-app.get('/', (req, res) => {
-    res.send(rendered_page)
-})
+
 // initiate new spoof
 app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url
     let url_2_spoof = decodeURI(req.body.url)

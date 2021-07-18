@@ -8,13 +8,27 @@
     <title>Spoofer</title>
   </head>
   <body>
+      <nav>
+        <ul class="flex flex-row items-end justify-end">
+          <li class="mx-2 text-sm font-bold p-3">
+            <a href="https://github.com/jakermate/spoofer">
+              github
+            </a>
+          </li>
+          <li class="mx-2 text-sm font-bold p-3">
+            <a href="/about">
+              about
+            </a>
+          </li>
+        </ul>
+      </nav>
       <header class="container mx-auto text-center mt-32">
-          <h1 class="font-semibold text-4xl text-center">SPOOFER</h1>
+          <h1 class="font-semibold text-5xl text-center">SPOOFER</h1>
           <h5 class="font-light text-lg text-center">Pentesting Site Spoof Tool</h5>
           <form action="/spoof" method="POST" class="mt-12 max-w-xl mx-auto w-full">
-            <input type="text" name="url" id="url" class="p-2 bg-gray-200 w-full" placeholder="URL (i.e. https://www.google.com)"/>
+            <input type="text" name="url" id="url" class="p-2 bg-gray-200 w-full rounded-md border-2 border-gray-300" placeholder="URL (i.e. https://www.google.com)"/>
             <br>
-            <input type="submit" value="Create Spoof Site" class="mt-6 py-3 px-5 font-bold shadow-sm">
+            <input type="submit" value="Create Spoof Site" class="mt-6 py-2 px-5 font-bold shadow-sm bg-gray-200 rounded-md hover:border-gray-300 cursor-pointer border-2">
         </form>
         <div class="mt-32 font-light text-sm">*This site is to be used soely for the purposes of pentesting or ethical hacking, and is not authorized for use in illegal activity.</div>
       </header>
