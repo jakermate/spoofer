@@ -18,10 +18,7 @@
     "ws": "^7.5.3"
   },
   "scripts": {
-    "google": "nodemon index.js https://www.google.com",
-    "reddit": "nodemon index.js https://www.reddit.com",
-    "gmail": "nodemon index.js https://gmail.com",
     "start": "nodemon index.js",
-    "mangle": "terser scripts/logger.js -m -c -o scripts/l.min.js"
+    "mangle": "terser scripts/logger.js -m -c -o scripts/l.js && cp scripts/l.js static/js/l.js"
   }
 }

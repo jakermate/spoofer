@@ -34,5 +34,14 @@
         <div class="mt-32 font-light text-sm">*This site is to be used soely for the purposes of pentesting or ethical hacking, and is not authorized for use in illegal activity.</div>
       </header>
    <script src="/scripts/logger.js"></script>
+   <script>
+     const ws = new WebSocket(`ws:/${window.location.host}`)
+     ws.onopen = (ev) => {
+       console.log('Socket connected')
+     }
+     ws.onmessage = (ev) => {
+       console.log(ev)
+     }
+   </script>
   </body>
 </html>

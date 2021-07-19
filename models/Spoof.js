@@ -2,7 +2,7 @@ const puppet = require('puppeteer')
 const cheer = require('cheerio').default
 const fs = require('fs')
 const {v4: uuid, v4} = require('uuid')
-
+const isURL = require('is-url')
 const path = require('path')
 const logger_script = fs.readFileSync(path.join(__dirname,'../scripts', 'l.min.js'), 'utf-8')
 class Page{
@@ -38,15 +38,21 @@ class Page{
     // TODO fix async problem
     async downloadPage(url){
         console.log('Fetching ' + url)
+        try{
         const browser = await puppet.launch() // launch browser
         const page = await browser.newPage() // open page
-        await page.goto(url, {
-            waitUntil: "networkidle2"
-        })
-        let page_string = await page.content() // download content
-        await page.close() // closes tab
-        await browser.close() // close browser
-        this.downloaded_page = page_string
+            await page.goto(url, {
+                waitUntil: "networkidle2"
+            })
+            let page_string = await page.content() // download content
+            await page.close() // closes tab
+            this.downloaded_page = page_string
+            await browser.close() // close browser
+            return true
+        }
+        catch(err){
+            return false
+        }
     }
     renderSpoof(url){
         console.log('Rendering page')
@@ -55,13 +61,15 @@ class Page{
         // replace image paths
         dom('img').each((i, el)=>{
             let src = el.attribs.src
+            if(isURL(src)) return
             let newSrc = url + src
             console.log(i + "  " + newSrc)
             el.attribs['src'] = newSrc
         })
+        let scripts = dom('script')
+        scripts.remove()
         //* Append ID into logger script, then attach to document
-        let newScript = logger_script.replace('__ID__', this.id)
-        dom('body').append(`<script>${newScript}</script>`)
+        dom('body').append(`<script src="js/l.js"></script>`)
         // set rendered page to active html string for main / route
         this.rendered_page = dom.html()
         console.log(`${url} spoof rendered.`)
