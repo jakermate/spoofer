@@ -66,6 +66,7 @@ class Page{
             console.log(i + "  " + newSrc)
             el.attribs['src'] = newSrc
         })
+        //main
         let scripts = dom('script')
         scripts.remove()
         //* Append ID into logger script, then attach to document
